@@ -36,7 +36,6 @@ public class GitHubProvider {
             Response response = client.newCall(request).execute();
             String string = response.body().string();
             GithubUser githubUser = JSON.parseObject(string, GithubUser.class);//string 对象自动解析成java类对象
-            System.out.println(githubUser.getBio());
             return githubUser;
         } catch (IOException e) {
         }
