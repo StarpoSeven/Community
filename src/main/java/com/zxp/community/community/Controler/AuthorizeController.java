@@ -2,6 +2,8 @@ package com.zxp.community.community.Controler;
 
 import com.zxp.community.community.DTO.AccessTokenDTO;
 import com.zxp.community.community.DTO.GithubUser;
+import com.zxp.community.community.mapper.UserMapper;
+import com.zxp.community.community.model.User;
 import com.zxp.community.community.provider.GitHubProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,13 +12,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.UUID;
 
 @Controller
 public class AuthorizeController {
 
     @Autowired
     private GitHubProvider gitHubProvider;
+
+    @Autowired
+    private UserMapper userMapper;
 
     @Value("${github.client.id}")
     private String ClientID;
@@ -29,7 +36,8 @@ public class AuthorizeController {
 
     @GetMapping("/callback")
     public String callback(@RequestParam(name="code") String code,
-                           @RequestParam(name="state")String state) throws IOException {
+                           @RequestParam(name="state")String state,
+                           HttpServletRequest request) throws IOException {
 
         AccessTokenDTO accessTokenDTO = new AccessTokenDTO();
         accessTokenDTO.setClient_id(ClientID);
@@ -38,8 +46,27 @@ public class AuthorizeController {
         accessTokenDTO.setRedirect_uri(ClientRedirectUri);
         accessTokenDTO.setState(state);
         String accessToken = gitHubProvider.getAccessToken(accessTokenDTO);
-        GithubUser user = gitHubProvider.getUser(accessToken);
-        System.out.println(user.getBio());
-        return "index";
+        GithubUser gihubUser = gitHubProvider.getUser(accessToken);
+
+        if(gihubUser != null) {
+            //存放入数据库
+            User user = new User();
+            user.setToken(UUID.randomUUID().toString());
+            user.setName(gihubUser.getName());
+            user.setAccountId(String.valueOf(gihubUser.getId()));
+            user.setGmtCreate(System.currentTimeMillis());
+            user.setGmtModified(user.getGmtCreate());
+            userMapper.Insert(user);//插入数据库之后，以token作为依据，
+            
+            //登录成功显示Cookie和Session
+            request.getSession().setAttribute("user",gihubUser);
+            return "redirect:/";
+
+        } else {
+            //登录失败，重新登录
+            return "redirect:/";
+        }
+
+
     }
 }
