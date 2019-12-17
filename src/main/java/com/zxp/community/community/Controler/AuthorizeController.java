@@ -46,20 +46,21 @@ public class AuthorizeController {
         accessTokenDTO.setRedirect_uri(ClientRedirectUri);
         accessTokenDTO.setState(state);
         String accessToken = gitHubProvider.getAccessToken(accessTokenDTO);
-        GithubUser gihubUser = gitHubProvider.getUser(accessToken);
+        GithubUser githubUser = gitHubProvider.getUser(accessToken);
 
-        if(gihubUser != null) {
+        if(githubUser != null) {
             //存放入数据库
             User user = new User();
-            user.setToken(UUID.randomUUID().toString());
-            user.setName(gihubUser.getName());
-            user.setAccountId(String.valueOf(gihubUser.getId()));
+            String token = UUID.randomUUID().toString();
+            user.setToken(token);
+            user.setName(githubUser.getName());
+            user.setAccountId(String.valueOf(githubUser.getId()));
             user.setGmtCreate(System.currentTimeMillis());
             user.setGmtModified(user.getGmtCreate());
             userMapper.Insert(user);//插入数据库之后，以token作为依据，
             
             //登录成功显示Cookie和Session
-            request.getSession().setAttribute("user",gihubUser);
+            request.getSession().setAttribute("user",githubUser);
             return "redirect:/";
 
         } else {
