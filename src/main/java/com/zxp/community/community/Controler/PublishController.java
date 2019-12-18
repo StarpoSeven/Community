@@ -38,6 +38,7 @@ public class PublishController {
         HttpServletRequest request,
         Model model){
 
+<<<<<<< HEAD
         model.addAttribute("title",title);
         model.addAttribute("description",description);
         model.addAttribute("tag",tag);
@@ -70,6 +71,20 @@ public class PublishController {
                     break;
                 }
             }
+=======
+        User user = null;
+        Cookie[] cookies = request.getCookies();
+        for (Cookie cookie : cookies) {
+            if(cookie.getName().equals("token")) {
+                String token = cookie.getValue();
+                user =userMapper.findByToken(token);
+                if(user != null) {
+                    request.getSession().setAttribute("user",user);
+                }
+                break;
+            }
+        }
+>>>>>>> bb7014c18066c4945d1a1495d0950e2e53c349f3
         if(user==null){
             model.addAttribute("error","用户未登录");
             return "publish";
