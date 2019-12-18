@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html" >
 <head>
     <title>ZXP 社区</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -53,23 +53,23 @@
             <h2><span class="glyphicon glyphicon-list" aria-hidden="true"></span>发现</h2>
             <hr>
 
-            <div class="media">
-                <div class="media-left">
-                    <a href="#">
-                        <img class="media-object" src="">
+            <div class="media" th:each="question : ${questions}">
 
-                    </a>
-                </div>
+<!--                <div class="media-left">-->
+<!--                    <a href="#">-->
+<!--                        <img class="media-object img-rounded" th:src="${question.user.avatarUrl}">-->
+<!--                    </a>-->
+<!--                </div>-->
                 <div class="media-body">
-                    <h4 class="media-heading">
-                        how to learn spring boot
-                    </h4>
-                    <span class="text-desc">2个回复*31次浏览*1小时前</span>
-
+                    <h4 class="media-heading" th:text="${question.title}"></h4>
+                    <span th:text="${question.description}"></span><br>
+                    <span class="text-desc">
+                        <span th:text="${question.commentCount}">个回复</span>*
+                        <span th:text="${question.viewCount}">次浏览*</span>
+                        <span th:text="${#dates.format(question.gmtCreate,'dd MMMM yyyy')}">1小时前</span>
+                    </span>
                 </div>
-
             </div>
-
         </div>
         <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
             <h3>热门话题</h3>

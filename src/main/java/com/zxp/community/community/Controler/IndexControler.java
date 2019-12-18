@@ -5,6 +5,7 @@ import com.zxp.community.community.mapper.QuestionMapper;
 import com.zxp.community.community.mapper.UserMapper;
 import com.zxp.community.community.model.Question;
 import com.zxp.community.community.model.User;
+import com.zxp.community.community.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,10 +21,8 @@ public class IndexControler {
     @Autowired
     private UserMapper userMapper;
 
-
-
     @Autowired
-    private QuestionMapper questionMapper;
+    private QuestionService questionService;
 
     @GetMapping("/")
     public String index(HttpServletRequest request,
@@ -40,8 +39,8 @@ public class IndexControler {
                     break;
                 }
             }
-        List<QuestionDTO> questionList = questionMapper.list();
-        model.addAttribute("question",questionList);
+        List<QuestionDTO> questionList = questionService.list();
+        model.addAttribute("questions",questionList);
         return "index";
     }
 }
